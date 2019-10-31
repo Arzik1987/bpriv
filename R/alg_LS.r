@@ -31,124 +31,197 @@
 #' set.seed(1)
 #' d <- squares(20)
 #' lpo <- d[, 1]/100
-#' lpm <- lazy.stepping.moderate(lpo)
+#' 
+#' 
+#' lpm1 <- lazy.stepping.moderate(lpo)
+#' lpm2 <- alg.stepping(lpo)
+#' lpm3 <- lazy.charging.moderate(lpo)
+#' lpm4 <- alg.stepping(lpo, regime = "lc")
+#' set.seed(1)
+#' lpm5 <- random.charging.moderate(lpo)
+#' set.seed(1)
+#' lpm6 <- alg.stepping(lpo, regime = "rc")
+#' 
 #' plot(ts(lpo))
-#' lines(ts(lpm), col = "red")
+#' lines(ts(lpm1), col = "red")
+#' lines(ts(lpm2), col = "blue")
+#' lines(ts(lpm3), col = "red")
+#' lines(ts(lpm4), col = "blue")
+#' lines(ts(lpm5), col = "red")
+#' lines(ts(lpm6), col = "blue")
 
-lazy.stepping.moderate <- function(lpo, max.be = 1, min.be = 0, max.bc = 0.5, max.bd = 0.5, be = 0.5, interval = 1, mode = 1) {
-    be <- (max.be - min.be) * be + min.be
-    interval <- interval / 60
-    loads <- lpo / interval
-    beta <- min(c(max.bc, max.bd))
-    charging.state <- 0
-    battery <- 1:length(loads)
-    battery[1] <- be
-    moderated.metered.loads <- 1:length(loads)
-    states <- 1:length(loads)
-    demand <- loads[1]
-    h <- compute.h(charging.state, demand, beta)
-    h.series <- 1:length(loads)
-    metered.load <- h * beta
+alg.stepping <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1, regime = "ls1"){
+  be <- max.be * be
+  
+  interval <- interval/60             # Change interval unit to hour
+  lpo <- lpo/interval                 # user load in kW
+  lpm <- rep(NA, length(lpo))         # grid load in kW
+  
+  # cs <- sample(0:1, size = 1)
+  cs <- 0
+  h <- ifelse(cs > 0, ceiling(lpo[1]/max.bp), floor(lpo[1]/max.bp))
+  
+  for(i in 1:length(lpo)){
 
-    for (i in 1:length(loads)) {
-        demand <- loads[i]
-        load.to.cover <- demand - metered.load
-
-        # The new demand is too high or low for the last ext. load
-        if (demand >= (h + 1) * beta || demand <= (h - 1) * beta) {
-          # First, set charging state
-          # Charging state now is used to determine the new ext. load;
-          # It will be eventually changed later according to difference between ext. load and demand
-          if (mode == 1) {
-            if (be < max.be / 2) {
-              charging.state <- 1
-            } else {
-              charging.state <- 0
-            }
-          } else {
-            charging.state <- sample(c(0,1), size=1, prob=c(0.5,0.5))
-          }
-          # Second, compute corresponding ext. load
-          h <- compute.h(charging.state, demand, beta)
-          metered.load <- h * beta
-        }
-
-        # Use difference between load demand and "external load" to determine needed battery energy
-        used.battery.energy <- (demand - metered.load) * interval
-
-        # If demand is greater than ext. load -> battery is used to provide engery for devices
-        # Else -> battery needs charging using power grid to "cover" the difference
-        if (used.battery.energy > 0) {
-          charging.state <- 0
-        } else if (used.battery.energy < 0) {
-          charging.state <- 1
-        }
-
-        if (charging.state == 1) {
-          res <- ls.charging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval)
-        }
-
-        if (charging.state == 0) {
-          res <- ls.discharging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval)
-        }
-
-        h.series[i] <- h
-        states[i] <- charging.state <- res[3]
-        moderated.metered.loads[i] <- metered.load <- res[2]
-        battery[i] <- be <- res[1]
+    if(regime == "lc"){
+      h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
     }
-    lpo <- moderated.metered.loads * interval
-    return (lpo)
-}
-
-ls.discharging <- function(be, used.battery.energy, demand, metered.load, beta, max.be, min.be, interval) {
-  if (be - used.battery.energy < min.be) {
-    h <- compute.h(0, demand, beta)
-    metered.load <- h * beta
-    while ((demand - metered.load > 0)) {
-      h <- h + 1
-      metered.load <- h * beta
+    if(regime == "rc"){
+      cs <- sample(0:1, size = 1, prob = c(be/max.be, (1 - be/max.be)))
+      h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
     }
-    used.battery.energy <- (demand - metered.load) * interval
-    return (ls.charging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval))
-  } else {
-    be <- be - used.battery.energy
+    
+    bp <- h*max.bp - lpo[i]
+    
+    if(abs(bp) > max.bp){
+      print("ls")
+      if(regime == "ls1"){
+        cs <- ifelse(be/max.be < 0.5, 1, 0)
+      } else {
+        cs <- sample(0:1, size = 1)
+      }
+      h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
+    }
+    
+    bp <- h*max.bp - lpo[i]
+    soc <- be + interval*bp
+    
+    if(soc < 0){
+      cs <- 1
+      h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
+    }
+    if(soc > max.be){
+      cs <- 0
+      h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
+    }
+    
+    bp <- h*max.bp - lpo[i]
+    be <- be + interval*bp
+    lpm[i] <- lpo[i] + bp
+    
+    if(be > max.be | be < 0){
+      stop("The battery charging rate/capacity ratio or the measuring interval is too large")
+    }
   }
-  return (c(be, metered.load, 0))
+  return(lpm*interval)
 }
 
-ls.charging <- function(be, used.battery.energy, demand, metered.load, beta, max.be, min.be, interval) {
-  # Battery shouldn't be overloaded
-  if (be - used.battery.energy > max.be) {
 
-    # Now the new metered load should be defined. But if it's not small enough for the battery to be discharged? Decrease h then!
-    h <- compute.h(1, demand, beta)
-    metered.load <- h * beta
-    while (h > 0 && (demand - metered.load) < 0) {
-      h <- h - 1
-      metered.load <- h * beta
-    }
-    used.battery.energy <- (demand - metered.load) * interval
-    return (ls.discharging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval))
-  } else {
-    # Now battery capacity should increase
-    be <- be - used.battery.energy
-  }
-  return (c(be, metered.load, 1))
-}
-
-compute.h <- function(state, demand, beta) {
-    if (state == 0) {
-        if (demand %% beta == 0) {
-            h <- (demand / beta) - 1
-        } else {
-            h <- floor(demand / beta)
-        }
-    }
-
-    if (state == 1) {
-        h <- ceiling(demand / beta)
-    }
-
-    return (h)
-}
+## OLD, probably, correct
+# lazy.stepping.moderate <- function(lpo, max.be = 1, min.be = 0, max.bc = 0.5, max.bd = 0.5, be = 0.5, interval = 1, mode = 1) {
+#     be <- (max.be - min.be) * be + min.be
+#     interval <- interval / 60
+#     loads <- lpo / interval
+#     beta <- min(c(max.bc, max.bd))
+#     charging.state <- 0
+#     battery <- 1:length(loads)
+#     battery[1] <- be
+#     moderated.metered.loads <- 1:length(loads)
+#     states <- 1:length(loads)
+#     demand <- loads[1]
+#     h <- compute.h(charging.state, demand, beta)
+#     h.series <- 1:length(loads)
+#     metered.load <- h * beta
+# 
+#     for (i in 1:length(loads)) {
+#         demand <- loads[i]
+#         load.to.cover <- demand - metered.load
+# 
+#         # The new demand is too high or low for the last ext. load
+#         if (demand >= (h + 1) * beta || demand <= (h - 1) * beta) {
+#           # First, set charging state
+#           # Charging state now is used to determine the new ext. load;
+#           # It will be eventually changed later according to difference between ext. load and demand
+#           if (mode == 1) {
+#             if (be < max.be / 2) {
+#               charging.state <- 1
+#             } else {
+#               charging.state <- 0
+#             }
+#           } else {
+#             charging.state <- sample(c(0,1), size=1, prob=c(0.5,0.5))
+#           }
+#           # Second, compute corresponding ext. load
+#           h <- compute.h(charging.state, demand, beta)
+#           metered.load <- h * beta
+#         }
+# 
+#         # Use difference between load demand and "external load" to determine needed battery energy
+#         used.battery.energy <- (demand - metered.load) * interval
+# 
+#         # If demand is greater than ext. load -> battery is used to provide engery for devices
+#         # Else -> battery needs charging using power grid to "cover" the difference
+#         if (used.battery.energy > 0) {
+#           charging.state <- 0
+#         } else if (used.battery.energy < 0) {
+#           charging.state <- 1
+#         }
+# 
+#         if (charging.state == 1) {
+#           res <- ls.charging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval)
+#         }
+# 
+#         if (charging.state == 0) {
+#           res <- ls.discharging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval)
+#         }
+# 
+#         h.series[i] <- h
+#         states[i] <- charging.state <- res[3]
+#         moderated.metered.loads[i] <- metered.load <- res[2]
+#         battery[i] <- be <- res[1]
+#     }
+#     lpo <- moderated.metered.loads * interval
+#     return (lpo)
+# }
+# 
+# ls.discharging <- function(be, used.battery.energy, demand, metered.load, beta, max.be, min.be, interval) {
+#   if (be - used.battery.energy < min.be) {
+#     h <- compute.h(0, demand, beta)
+#     metered.load <- h * beta
+#     while ((demand - metered.load > 0)) {
+#       h <- h + 1
+#       metered.load <- h * beta
+#     }
+#     used.battery.energy <- (demand - metered.load) * interval
+#     return (ls.charging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval))
+#   } else {
+#     be <- be - used.battery.energy
+#   }
+#   return (c(be, metered.load, 0))
+# }
+# 
+# ls.charging <- function(be, used.battery.energy, demand, metered.load, beta, max.be, min.be, interval) {
+#   # Battery shouldn't be overloaded
+#   if (be - used.battery.energy > max.be) {
+# 
+#     # Now the new metered load should be defined. But if it's not small enough for the battery to be discharged? Decrease h then!
+#     h <- compute.h(1, demand, beta)
+#     metered.load <- h * beta
+#     while (h > 0 && (demand - metered.load) < 0) {
+#       h <- h - 1
+#       metered.load <- h * beta
+#     }
+#     used.battery.energy <- (demand - metered.load) * interval
+#     return (ls.discharging(be=be, used.battery.energy=used.battery.energy, demand=demand, metered.load=metered.load, beta=beta, max.be=max.be, min.be=min.be, interval=interval))
+#   } else {
+#     # Now battery capacity should increase
+#     be <- be - used.battery.energy
+#   }
+#   return (c(be, metered.load, 1))
+# }
+# 
+# compute.h <- function(state, demand, beta) {
+#     if (state == 0) {
+#         if (demand %% beta == 0) {
+#             h <- (demand / beta) - 1
+#         } else {
+#             h <- floor(demand / beta)
+#         }
+#     }
+# 
+#     if (state == 1) {
+#         h <- ceiling(demand / beta)
+#     }
+# 
+#     return (h)
+# }
