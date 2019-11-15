@@ -43,14 +43,14 @@ priv.dc <- function(lpo, lpm, n = 10, regime = c("reg", "lpo")){
     lpm <- tmp[, 2]
     
     fit <- lm(lpm ~ lpo)
-    # summary(fit)$r.squared
-    lpm.hat <- fit$fitted.values
+    res <- summary(fit)$r.squared
+    # lpm.hat <- fit$fitted.values
   } else if(regime == "lpo"){
-    lpm.hat <- lpo
+    ess <- sum((lpm - mean(lpm))^2)
+    rss <- sum((lpo - lpm)^2)
+    res <- 1 - rss/(rss + ess)
   }
   
-  ess <- sum((lpm.hat - mean(lpm))^2)
-  rss <- sum((lpm.hat - lpm)^2)
-  
-  1 - rss/(rss + ess)
+  return(res)
+
 }
