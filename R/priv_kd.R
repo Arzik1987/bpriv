@@ -10,7 +10,7 @@
 #' @export
 #' @examples
 #' set.seed(1)
-#' d <- squares(1000)
+#' d <- squares(20)
 #' lpo <- d[, 1]
 #' lpm <- d[, 2]
 #' priv.kd(lpo, lpm)
@@ -18,8 +18,9 @@
 priv.kd <- function(lpo, lpm, num.bins = 20, bin.size = 0.01, mode = "number"){
 
   temp <- discr.together(lpo = lpo, lpm = lpm, num.bins = num.bins, bin.size = bin.size, mode = mode)
-  lpo <- table(temp[, 1])
-  lpm <- table(temp[, 2])
+  levels <- sort(unique(as.numeric(temp)))
+  lpo <- table(c(temp[, 1], levels)) - 1
+  lpm <- table(c(temp[, 2], levels)) - 1
   lpo <- lpo/sum(lpo)
   lpm <- lpm/sum(lpm)
   

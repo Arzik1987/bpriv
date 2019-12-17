@@ -207,7 +207,8 @@ mi.mns.hist <- function(lpo, lpm, features){
 #' @param lpo,lpm original and modified load profiles
 #' @param regime assumption on the type of process; "iid" - 
 #' independently identically distributed, "ms" - first order Markov stationary,
-#' "mns" - first order Markov non-stationary with features
+#' "mns" - first order Markov non-stationary with features,
+#' "bin" - the MI with i.i.d. assumption and two bins (num.bins = 2)
 #' @param num.bins number of bins
 #' @param bin.size size of bins
 #' @param mode if "number", load profile is split into num.bins of equidistant bins;
@@ -220,12 +221,14 @@ mi.mns.hist <- function(lpo, lpm, features){
 #' @export
 #' @examples
 #' set.seed(1)
-#' d <- squares(10000)
+#' d <- squares(1000)
 #' lpo <- d[, 1]
 #' lpm <- d[, 2]
 #' priv.mi.hist(lpo, lpm, regime = "iid", num.bins = 20)
 #' # binary version:
 #' priv.mi.hist(lpo, lpm, regime = "iid", num.bins = 2)
+#' priv.mi.hist(lpo, lpm, regime = "bin")
+#' 
 #' priv.mi.hist(lpo, lpm, regime = "ms", num.bins = 20)
 #' 
 #' set.seed(1)
@@ -235,10 +238,16 @@ mi.mns.hist <- function(lpo, lpm, features){
 #' features <- c(rep(1, 500), rep(2, 250), rep(3, 250))
 #' priv.mi.hist(lpo, lpm, regime = "mns", features = features)
 
-priv.mi.hist <- function(lpo, lpm, regime = c("iid", "ms", "mns"), 
+priv.mi.hist <- function(lpo, lpm, regime = c("iid", "ms", "mns", "bin"), 
                          num.bins = 20, bin.size = 0.01, mode = "number", features = NA){
   
   if(length(unique(lpm)) == 1) return(0)
+  
+  if(regime == "bin"){
+    regime <- "iid"
+    num.bins <- 2
+    mode <- "number"
+  }
   
   lpo <- discr.sep(lp = lpo, num.bins = num.bins, bin.size = bin.size, mode = mode)
   lpm <- discr.sep(lp = lpm, num.bins = num.bins, bin.size = bin.size, mode = mode)

@@ -4,8 +4,8 @@
 \alias{alg.be}
 \title{Best-effort algorithm}
 \usage{
-alg.be(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1,
-  regime = "first")
+alg.be(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval,
+  mode = "first")
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}
@@ -18,7 +18,7 @@ alg.be(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1,
 
 \item{interval}{Demand metering interval, unit: minute}
 
-\item{regime}{If "first" (default) our interpretation of original algorithm [1] is used.
+\item{mode}{If "first" (default) our interpretation of original algorithm [1] is used.
 Otherwise, the algorith works as described in [2].}
 }
 \description{
@@ -37,19 +37,19 @@ the battery is capable of charging/discharging again.
 set.seed(1)
 d <- squares(20)
 lpo <- d[, 1]/100
-lpm1 <- alg.be(lpo)
-lpm2 <- alg.be(lpo, regime = "second")
+lpm1 <- alg.be(lpo, interval = 1)
+lpm2 <- alg.be(lpo, interval = 1, mode = "second")
 plot(ts(lpo))
 lines(ts(lpm1), col = "red")
 lines(ts(lpm2), col = "blue")
 
-lpm1 <- alg.be(lpo, max.be = 0.01, max.bp = 10)
-lpm2 <- alg.be(lpo, max.be = 0.01, max.bp = 10, regime = "second")
+lpm1 <- alg.be(lpo, interval = 1, max.be = 0.01, max.bp = 10)
+lpm2 <- alg.be(lpo, interval = 1, max.be = 0.01, max.bp = 10, mode = "second")
 plot(ts(lpo))
 lines(ts(lpm1), col = "red")
 lines(ts(lpm2), col = "blue")
 
-lpm <- alg.be(lpo, max.bp = 0)
+lpm <- alg.be(lpo, interval = 1, max.bp = 0)
 plot(ts(lpo))
 lines(ts(lpm), col = "red")
 }

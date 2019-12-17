@@ -25,7 +25,7 @@ K-Divergence Privacy Measure
 }
 \examples{
 set.seed(1)
-d <- squares(1000)
+d <- squares(20)
 lpo <- d[, 1]
 lpm <- d[, 2]
 priv.kd(lpo, lpm)

@@ -4,8 +4,8 @@
 \alias{alg.stepping}
 \title{Stepping algorithm}
 \usage{
-alg.stepping(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1,
-  regime = "ls1")
+alg.stepping(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval,
+  mode = "ls1")
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}
@@ -18,7 +18,7 @@ alg.stepping(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1,
 
 \item{interval}{Demand metering interval, unit: minute}
 
-\item{regime}{Defines the charging/discharging strategy within the steping
+\item{mode}{Defines the charging/discharging strategy within the steping
 framework. Possible values are "ls1", "ls2", "lc" and "rc" corresponding 
 to two versions of lasy stepping, lasy charging and random charging algorithms
 respectively (see the details and the reference).}
@@ -54,10 +54,10 @@ battery is set randomly each time a load demand comes in.
 set.seed(1)
 d <- squares(20)
 lpo <- d[, 1]/100
-lpm.ls1 <- alg.stepping(lpo)
-lpm.ls2 <- alg.stepping(lpo, regime = "ls2")
-lpm.lc <- alg.stepping(lpo, regime = "lc")
-lpm.rc <- alg.stepping(lpo, regime = "rc")
+lpm.ls1 <- alg.stepping(lpo, interval = 1)
+lpm.ls2 <- alg.stepping(lpo, interval = 1, mode = "ls2")
+lpm.lc <- alg.stepping(lpo, interval = 1, mode = "lc")
+lpm.rc <- alg.stepping(lpo, interval = 1, mode = "rc")
 
 plot(ts(lpo))
 lines(ts(lpm.ls1), col = "red")

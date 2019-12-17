@@ -7,7 +7,7 @@
 #' @param max.bp Battery's maximum charing and discharging rate, unit: kW
 #' @param be Battery's current state of charge; 0 is empty, 1 is full
 #' @param interval Demand metering interval, unit: minute
-#' @param regime If "first" (default) our interpretation of original algorithm [1] is used.
+#' @param mode If "first" (default) our interpretation of original algorithm [1] is used.
 #' Otherwise, the algorith works as described in [2].
 #' @export
 #' @details In this algorithm, the external load is kept 
@@ -27,23 +27,23 @@
 #' set.seed(1)
 #' d <- squares(20)
 #' lpo <- d[, 1]/100
-#' lpm1 <- alg.be(lpo)
-#' lpm2 <- alg.be(lpo, regime = "second")
+#' lpm1 <- alg.be(lpo, interval = 1)
+#' lpm2 <- alg.be(lpo, interval = 1, mode = "second")
 #' plot(ts(lpo))
 #' lines(ts(lpm1), col = "red")
 #' lines(ts(lpm2), col = "blue")
 #' 
-#' lpm1 <- alg.be(lpo, max.be = 0.01, max.bp = 10)
-#' lpm2 <- alg.be(lpo, max.be = 0.01, max.bp = 10, regime = "second")
+#' lpm1 <- alg.be(lpo, interval = 1, max.be = 0.01, max.bp = 10)
+#' lpm2 <- alg.be(lpo, interval = 1, max.be = 0.01, max.bp = 10, mode = "second")
 #' plot(ts(lpo))
 #' lines(ts(lpm1), col = "red")
 #' lines(ts(lpm2), col = "blue")
 #' 
-#' lpm <- alg.be(lpo, max.bp = 0)
+#' lpm <- alg.be(lpo, interval = 1, max.bp = 0)
 #' plot(ts(lpo))
 #' lines(ts(lpm), col = "red")
 
-alg.be <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1, regime = "first") {
+alg.be <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval, mode = "first") {
   be <- max.be * be
   
   interval <- interval/60             # Change interval unit to hour
@@ -56,7 +56,7 @@ alg.be <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1, regime
     bp <- lpo[i - 1] - lpo[i] + bp    # the recommended charging rate
     soc <- be + interval*bp           # SOC which would have been obtained withour restrictions
     
-    if(regime == "first"){              # as in [1]
+    if(mode == "first"){              # as in [1]
       soc <- ifelse(soc < 0, 0, soc)  # the SOC after the next period
       soc <- ifelse(soc > max.be, max.be, soc)
       bp <- min(abs(soc - be)/interval, max.bp)*sign(soc - be)

@@ -5,7 +5,7 @@
 \title{NILL algorithm}
 \usage{
 alg.nill(lpo, max.be = 1, max.bp = 0.5, be = 0.5, alpha = 0.5,
-  voltage = 110, interval = 1, kst = "avg")
+  voltage, interval, kst = "avg")
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}
@@ -42,8 +42,8 @@ place when in stable state the battery is too low.
 set.seed(1)
 d <- squares(20)
 lpo <- d[, 1]/100
-lpm <- alg.nill(lpo, kst = "avg")
-lpm1 <- alg.be(lpo)
+lpm <- alg.nill(lpo, voltage = 110, interval = 1, kst = "avg")
+lpm1 <- alg.be(lpo, interval = 1)
 plot(ts(lpo))
 lines(ts(lpm), col = "blue")
 lines(ts(lpm1), col = "red") # compare to Best Effort algorithm

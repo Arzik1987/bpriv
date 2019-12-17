@@ -32,14 +32,14 @@
 #' set.seed(1)
 #' d <- squares(20)
 #' lpo <- d[, 1]/100
-#' lpm <- alg.nill(lpo, kst = "avg")
-#' lpm1 <- alg.be(lpo)
+#' lpm <- alg.nill(lpo, voltage = 110, interval = 1, kst = "avg")
+#' lpm1 <- alg.be(lpo, interval = 1)
 #' plot(ts(lpo))
 #' lines(ts(lpm), col = "blue")
 #' lines(ts(lpm1), col = "red") # compare to Best Effort algorithm
 
 alg.nill <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, alpha = 0.5, 
-                     voltage = 110, interval = 1, kst = "avg"){
+                     voltage, interval, kst = "avg"){
   be <- max.be*be
   
   interval <- interval/60             # Change interval unit to hour
@@ -76,7 +76,7 @@ alg.nill <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, alpha = 0.5,
     }
     
     i <- i + 1
-    print(i)
+    # print(i)
   }
   
   return(lpm*interval)

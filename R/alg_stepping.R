@@ -7,7 +7,7 @@
 #' @param max.bp Battery's maximum charing rate, unit: kW
 #' @param be Battery's current capacity level; 0 is empty, 1 is full
 #' @param interval Demand metering interval, unit: minute
-#' @param regime Defines the charging/discharging strategy within the steping
+#' @param mode Defines the charging/discharging strategy within the steping
 #' framework. Possible values are "ls1", "ls2", "lc" and "rc" corresponding 
 #' to two versions of lasy stepping, lasy charging and random charging algorithms
 #' respectively (see the details and the reference).
@@ -38,10 +38,10 @@
 #' set.seed(1)
 #' d <- squares(20)
 #' lpo <- d[, 1]/100
-#' lpm.ls1 <- alg.stepping(lpo)
-#' lpm.ls2 <- alg.stepping(lpo, regime = "ls2")
-#' lpm.lc <- alg.stepping(lpo, regime = "lc")
-#' lpm.rc <- alg.stepping(lpo, regime = "rc")
+#' lpm.ls1 <- alg.stepping(lpo, interval = 1)
+#' lpm.ls2 <- alg.stepping(lpo, interval = 1, mode = "ls2")
+#' lpm.lc <- alg.stepping(lpo, interval = 1, mode = "lc")
+#' lpm.rc <- alg.stepping(lpo, interval = 1, mode = "rc")
 #' 
 #' plot(ts(lpo))
 #' lines(ts(lpm.ls1), col = "red")
@@ -50,7 +50,7 @@
 #' lines(ts(lpm.rc), col = "purple")
 
 
-alg.stepping <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1, regime = "ls1"){
+alg.stepping <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval, mode = "ls1"){
   be <- max.be * be
   
   interval <- interval/60             # Change interval unit to hour
@@ -63,19 +63,19 @@ alg.stepping <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval = 1, 
   
   for(i in 1:length(lpo)){
 
-    if(regime == "lc"){               # try to keep cs constant
+    if(mode == "lc"){               # try to keep cs constant
       h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))   
     }
-    if(regime == "rc"){               # randomly choose cs with probabilities depending on SOC
+    if(mode == "rc"){               # randomly choose cs with probabilities depending on SOC
       cs <- sample(0:1, size = 1, prob = c(be/max.be, (1 - be/max.be)))
       h <- ifelse(cs > 0, ceiling(lpo[i]/max.bp), floor(lpo[i]/max.bp))
     }
     
     bp <- h*max.bp - lpo[i]           # battery charging rate kWh
     
-    if(abs(bp) > max.bp){             # should not enter this if regime = "lc" or "rc"
-      print("ls")
-      if(regime == "ls1"){            # choose charging if SOC is less than half capacity
+    if(abs(bp) > max.bp){             # should not enter this if mode = "lc" or "rc"
+      # print("ls")
+      if(mode == "ls1"){            # choose charging if SOC is less than half capacity
         cs <- ifelse(be/max.be < 0.5, 1, 0)
       } else {
         cs <- sample(0:1, size = 1)   # choose cs at random

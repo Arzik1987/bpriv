@@ -4,15 +4,16 @@
 \alias{priv.mi.hist}
 \title{Histogram MI estimator for different assumptions}
 \usage{
-priv.mi.hist(lpo, lpm, regime = c("iid", "ms", "mns"), num.bins = 20,
-  bin.size = 0.01, mode = "number", features = NA)
+priv.mi.hist(lpo, lpm, regime = c("iid", "ms", "mns", "bin"),
+  num.bins = 20, bin.size = 0.01, mode = "number", features = NA)
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}
 
 \item{regime}{assumption on the type of process; "iid" - 
 independently identically distributed, "ms" - first order Markov stationary,
-"mns" - first order Markov non-stationary with features}
+"mns" - first order Markov non-stationary with features,
+"bin" - the MI with i.i.d. assumption and two bins (num.bins = 2)}
 
 \item{num.bins}{number of bins}
 
@@ -32,12 +33,14 @@ under various assumptions and variables transformations (= choices of binning sc
 }
 \examples{
 set.seed(1)
-d <- squares(10000)
+d <- squares(1000)
 lpo <- d[, 1]
 lpm <- d[, 2]
 priv.mi.hist(lpo, lpm, regime = "iid", num.bins = 20)
 # binary version:
 priv.mi.hist(lpo, lpm, regime = "iid", num.bins = 2)
+priv.mi.hist(lpo, lpm, regime = "bin")
+
 priv.mi.hist(lpo, lpm, regime = "ms", num.bins = 20)
 
 set.seed(1)
