@@ -250,7 +250,11 @@ priv.mi.hist <- function(lpo, lpm, regime = c("iid", "ms", "mns", "bin"),
   }
   
   lpo <- discr.sep(lp = lpo, num.bins = num.bins, bin.size = bin.size, mode = mode)
-  lpm <- discr.sep(lp = lpm, num.bins = num.bins, bin.size = bin.size, mode = mode)
+  if(length(unique(lpm)) != 1){
+    lpm <- discr.sep(lp = lpm, num.bins = num.bins, bin.size = bin.size, mode = mode)
+  } else {
+    lpm <- rep(0, length(lpm))
+  }
   
   if(regime == "iid"){
     res <- mi.hist.freqs(hist2d(cbind(lpo, lpm)))

@@ -79,7 +79,7 @@ alg.nill <- function(lpo, max.be = 1, max.bp = 0.5, be = 0.5, alpha = 0.5,
     # print(i)
   }
   
-  return(lpm*interval)
+  return(round(lpm*interval, 10))
   
 }
 
