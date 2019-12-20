@@ -36,6 +36,9 @@ discr.sep <- function(lp, num.bins = 20, bin.size = 0.01,
   }else{
     stop("such mode is not supported")
   }
+  
+  breaks[1] <- breaks[1] - 1
+  breaks[length(breaks)] <- breaks[length(breaks)] + 1
 
   as.numeric(cut(lp, breaks, include.lowest = TRUE))
 }
