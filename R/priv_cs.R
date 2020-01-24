@@ -29,27 +29,27 @@ priv.cs <- function(lpo, lpm, n = -1){
   }
 
   if(n == -1){
-    nmax <- min(length(lpm) - 1, 25)
-    test.range <- c(3:nmax)
-    avg.sil <- function(n){
-      km.res <- cluster::clara(as.matrix(lpo), k = n)
-      ss <- cluster::silhouette(km.res)
-      mean(ss[, 3])
-    }
-    avg.sil.vals <- sapply(test.range, avg.sil)
-    # factoextra::fviz_nbclust(as.matrix(lpo), clara). # check correctness
-    
-    n <- test.range[which(avg.sil.vals == max(avg.sil.vals))]
-    if(n > length(unique(lpm))){
-      n = length(unique(lpm))
+    nmax <- min(length(unique(lpm)), 25)
+    if(nmax == 2){
+      n = 2
+    } else {
+      test.range <- c(3:nmax)
+      avg.sil <- function(n){
+        km.res <- cluster::clara(as.matrix(lpo), k = n)
+        ss <- cluster::silhouette(km.res)
+        mean(ss[, 3])
+      }
+      avg.sil.vals <- sapply(test.range, avg.sil)
+      # factoextra::fviz_nbclust(as.matrix(lpo), clara). # check correctness
+      n <- test.range[which(avg.sil.vals == max(avg.sil.vals))]
     }
   }
   
   tmp = 0
-  while(tmp == 0){
+  while(tmp == 0){ # try to cluster in n clusters. If does not work decrease n. If n = 1 return 0
     if(n == 1){
       tmp = 1
-      return(-1)
+      return(0)
     }
     y.cl <- cluster::clara(lpm, k = n)
     if(length(y.cl$medoids) != length(unique(y.cl$medoids))){
