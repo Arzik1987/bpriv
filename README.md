@@ -14,7 +14,7 @@ After successful installation, in RStidio (by default bottom-right window, tab '
 
 ## Resources
 
-The `bpriv` package used for [experiments](https://github.com/Arzik1987/SaP) in [Privacy Measures and Storage Technologies for Battery-Based Load Hiding - an Overview and Experimental Study](https://github.com/Arzik1987/SaP).
+The `bpriv` package used for [experiments](https://github.com/Arzik1987/SaP) in [Privacy Measures and Storage Technologies for Battery-Based Load Hiding - an Overview and Experimental Study](https://dl.acm.org/doi/abs/10.1145/3396851.3398320).
 
 
 
