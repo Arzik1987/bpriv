@@ -4,8 +4,7 @@
 \alias{discr.sep}
 \title{Discretization of numerical vector}
 \usage{
-discr.sep(lp, num.bins = 20, bin.size = 0.01, mode = c("number",
-  "size"))
+discr.sep(lp, num.bins = 20, bin.size = 0.01, mode = c("number", "size"))
 }
 \arguments{
 \item{lp}{vectors to be quantized}

@@ -4,8 +4,7 @@
 \alias{alg.stepping}
 \title{Stepping algorithm}
 \usage{
-alg.stepping(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval,
-  mode = "ls1")
+alg.stepping(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval, mode = "ls1")
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}

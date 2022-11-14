@@ -4,8 +4,14 @@
 \alias{priv.mi.knn}
 \title{kNN MI estimator for different assumptions}
 \usage{
-priv.mi.knn(lpo, lpm, regime = c("iid", "ms", "mns"), k = 2,
-  features = rep(1, length(lpo)), noise = 10^-8)
+priv.mi.knn(
+  lpo,
+  lpm,
+  regime = c("iid", "ms", "mns"),
+  k = 2,
+  features = rep(1, length(lpo)),
+  noise = 10^-8
+)
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}

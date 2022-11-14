@@ -4,8 +4,14 @@
 \alias{priv.er.hist}
 \title{Histogramm estimator entropy ratio}
 \usage{
-priv.er.hist(lpo, lpm, num.bins = 20, bin.size = 0.01,
-  mode = "number", regime = c("zeros", "nozeros"))
+priv.er.hist(
+  lpo,
+  lpm,
+  num.bins = 20,
+  bin.size = 0.01,
+  mode = "number",
+  regime = c("zeros", "nozeros")
+)
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}

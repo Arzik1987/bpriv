@@ -4,8 +4,13 @@
 \alias{discr.together}
 \title{Discretization of two numerical vectors}
 \usage{
-discr.together(lpo, lpm, num.bins = 20, bin.size = 0.01,
-  mode = c("number", "size"))
+discr.together(
+  lpo,
+  lpm,
+  num.bins = 20,
+  bin.size = 0.01,
+  mode = c("number", "size")
+)
 }
 \arguments{
 \item{lpo, lpm}{vectors to be quantized}

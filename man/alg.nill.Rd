@@ -4,8 +4,16 @@
 \alias{alg.nill}
 \title{NILL algorithm}
 \usage{
-alg.nill(lpo, max.be = 1, max.bp = 0.5, be = 0.5, alpha = 0.5,
-  voltage, interval, kst = "avg")
+alg.nill(
+  lpo,
+  max.be = 1,
+  max.bp = 0.5,
+  be = 0.5,
+  alpha = 0.5,
+  voltage,
+  interval,
+  kst = "avg"
+)
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}

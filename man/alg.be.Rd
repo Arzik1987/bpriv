@@ -4,8 +4,7 @@
 \alias{alg.be}
 \title{Best-effort algorithm}
 \usage{
-alg.be(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval,
-  mode = "first")
+alg.be(lpo, max.be = 1, max.bp = 0.5, be = 0.5, interval, mode = "first")
 }
 \arguments{
 \item{lpo}{Energy demand series as nummeric vector, unit: kWh}

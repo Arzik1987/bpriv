@@ -4,8 +4,15 @@
 \alias{priv.mi.hist}
 \title{Histogram MI estimator for different assumptions}
 \usage{
-priv.mi.hist(lpo, lpm, regime = c("iid", "ms", "mns", "bin"),
-  num.bins = 20, bin.size = 0.01, mode = "number", features = NA)
+priv.mi.hist(
+  lpo,
+  lpm,
+  regime = c("iid", "ms", "mns", "bin"),
+  num.bins = 20,
+  bin.size = 0.01,
+  mode = "number",
+  features = NA
+)
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}

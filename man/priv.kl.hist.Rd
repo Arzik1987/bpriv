@@ -4,8 +4,7 @@
 \alias{priv.kl.hist}
 \title{Histogram estimator for KL divergence}
 \usage{
-priv.kl.hist(lpo, lpm, num.bins = 20, bin.size = 0.01,
-  mode = "number")
+priv.kl.hist(lpo, lpm, num.bins = 20, bin.size = 0.01, mode = "number")
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}

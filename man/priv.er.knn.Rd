@@ -4,8 +4,7 @@
 \alias{priv.er.knn}
 \title{Nearest neighbor estimator entropy ratio}
 \usage{
-priv.er.knn(lpo, lpm, k = 2, regime = c("zeros", "nozeros"),
-  noise = 10^-8)
+priv.er.knn(lpo, lpm, k = 2, regime = c("zeros", "nozeros"), noise = 10^-8)
 }
 \arguments{
 \item{lpo, lpm}{original and modified load profiles}
