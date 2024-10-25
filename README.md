@@ -8,7 +8,7 @@ The recommended way of working with the package consists of the following steps:
 - install [RStudio](https://posit.co/);
 - open `bpriv.Rproj`;
 - open and execute `build.R` (`Ctrl+A` -> `Ctrl+Enter` in Rstudio). Answer 'Yes' if/when the installation of additional packages is proposed;
-- use `install.packages()` whenever the installation breaks due to the absence of some packages and then repeat executing `build.R` until success.
+- if the installation breaks due to the absence of some packages `install.packages(<package_name>)` and execute `build.R` again.
 
 After successful installation, in RStidio (by default bottom-right window, tab 'packages'), navigate to 'bpriv' to see the list of functions it contains. Click the function name to see its description and exemplary usage.
 
